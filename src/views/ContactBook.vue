@@ -36,6 +36,15 @@
                 <i class="fas fa-address-card"></i>
             </h4>
             <ContactCard :contact="activeContact" />
+            <router-link
+                :to="{
+                    name: 'contact.edit',
+                    params: { id: activeContact._id },
+                }">
+                <span class="mt-2 badge badge-warning">
+                    <i class="fas fa-edit"></i> Hiệu chỉnh</span>
+            </router-link>
+
         </div>
     </div>
 </div>
@@ -61,21 +70,18 @@ export default {
         };
     },
     watch: {
-        // Giám sát các thay đổi của biến searchText.
-        // Bỏ chọn phần tử đang được chọn trong danh sách.
         searchText() {
             this.activeIndex = -1;
         },
     },
-    computed: {
-            // Chuyển các đối tượng contact thành chuỗi để tiện cho tìm kiếm.
+    computed: {  
         contactStrings() {
             return this.contacts.map((contact) => {
                 const { name, email, address, phone } = contact;
                 return [name, email, address, phone].join("");
             });
             },
-            // Trả về các contact có chứa thông tin cần tìm kiếm.
+            
         filteredContacts() {
             if (!this.searchText) return this.contacts;
             return this.contacts.filter((_contact, index) =>
@@ -90,32 +96,32 @@ export default {
         filteredContactsCount() {
             return this.filteredContacts.length;
         },
-},
-methods: {
-    async retrieveContacts() {
-        try {
-            this.contacts = await ContactService.getAll();
-        } catch (error) {
-            console.log(error);
-        }
     },
-    refreshList() {
-        this.retrieveContacts();
-        this.activeIndex = -1;
-    },
-    async removeAllContacts() {
-        if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
+    methods: {
+        async retrieveContacts() {
             try {
-                await ContactService.deleteAll();
+                this.contacts = await ContactService.getAll();
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        refreshList() {
+            this.retrieveContacts();
+            this.activeIndex = -1;
+        },
+        async removeAllContacts() {
+            if (confirm("Bạn muốn xóa tất cả Liên hệ?")) {
+                try {
+                    await ContactService.deleteAll();
                 this.refreshList();
             } catch (error) {
                 console.log(error);
             }
         }
     },
-    goToAddContact() {
-        this.$router.push({ name: "contact.add" });
-    },
+            goToAddContact() {
+            this.$router.push({ name: "contact.add" });
+        },
     },
     mounted() {
         this.refreshList();
